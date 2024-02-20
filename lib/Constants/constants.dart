@@ -131,14 +131,11 @@ class StartBG extends StatelessWidget {
         // LOGO
         Positioned(
           top: 150,
-          child: Hero(
-            tag: 'logo',
-            child: Image.asset(
-              './assets/images/logo.png',
-              fit: BoxFit.fill,
-              width: 150,
-              height: 150,
-            ),
+          child: Image.asset(
+            './assets/images/logo.png',
+            fit: BoxFit.fill,
+            width: 150,
+            height: 150,
           ),
         ),
       ],

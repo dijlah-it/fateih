@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:gradient_borders/gradient_borders.dart';
 import 'package:slide_switcher/slide_switcher.dart';
+import 'package:auto_size_text_field/auto_size_text_field.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -43,11 +44,6 @@ class _ProfilePageState extends State<ProfilePage> {
       "icon": Icons.email_outlined
     },
     {
-      "title": 'العنوان :',
-      "subTitle": 'العراق - بغداد - شارع المنصور',
-      "icon": Icons.location_on_outlined
-    },
-    {
       "title": 'الانستا :',
       "subTitle": '@DIJLAH',
       "icon": Icons.facebook_outlined
@@ -56,6 +52,11 @@ class _ProfilePageState extends State<ProfilePage> {
       "title": 'فيس بوك :',
       "subTitle": '@DIJLAH',
       "icon": Icons.facebook_outlined
+    },
+    {
+      "title": 'العنوان :',
+      "subTitle": 'العراق - بغداد - شارع المنصور',
+      "icon": Icons.location_on_outlined
     },
   ];
   @override
@@ -279,8 +280,12 @@ class ProfileItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final TextEditingController? controller;
+    controller =
+        TextEditingController.fromValue(TextEditingValue(text: subTitle));
+
     return Container(
-      height: 50,
+      height: 55,
       clipBehavior: Clip.antiAlias,
       margin: const EdgeInsets.symmetric(vertical: 5),
       decoration: BoxDecoration(
@@ -319,14 +324,27 @@ class ProfileItem extends StatelessWidget {
           ),
           const Gap(10),
           Expanded(
-            child: Text(
-              subTitle,
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontSize: 15,
+            child: AutoSizeTextField(
+              textAlign: TextAlign.right,
+              controller: controller,
+              style: const TextStyle(fontSize: 17),
+              maxLines: 1,
+              decoration: const InputDecoration(
+                border: InputBorder.none,
+                isDense: true,
+                contentPadding: EdgeInsets.all(20),
               ),
             ),
           ),
+          // Expanded(
+          //   child: TextFormField(
+          //     controller: controller,
+          //     textAlign: TextAlign.center,
+          //     decoration: InputDecoration(
+          //       border: InputBorder.none,
+          //     ),
+          //   ),
+          // ),
         ],
       ),
     );

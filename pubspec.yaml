@@ -42,10 +42,12 @@ dependencies:
   awesome_snackbar_content_new: ^0.1.2
   salomon_bottom_bar: ^3.3.2
   flutter_svg: ^2.0.9
-  accordion: ^2.6.0
   slide_switcher: ^1.1.2
   board_datetime_picker: ^1.4.0
   substring_highlight: ^1.0.33
+  carousel_slider: ^4.2.1
+  action_slider: ^0.7.0
+  auto_size_text_field: ^2.2.2
 
 dev_dependencies:
   flutter_test:

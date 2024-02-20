@@ -2,6 +2,7 @@ import 'package:fateih/Constants/constants.dart';
 import 'package:fateih/Pages/HomePages/accountbalance_page.dart';
 import 'package:fateih/Pages/HomePages/buycard.dart';
 import 'package:fateih/Pages/HomePages/content_page.dart';
+import 'package:fateih/Pages/HomePages/notif_page.dart';
 import 'package:fateih/Pages/HomePages/profile_page.dart';
 import 'package:fateih/Pages/HomePages/setting_page.dart';
 import 'package:fateih/Pages/HomePages/transactions_page.dart';
@@ -23,9 +24,9 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   double collapsedHeight = 165;
-  double expandedHeight = 300;
-  double rotationTransition = 0 / 360;
+  double expandedHeight = 290;
   int _currentIndex = 0;
+  bool collapse = true;
 
   static const List<Object> _headerButtonsGroup = [
     {"title": 'المحفطة', "path": 'wallet-icon.svg', "tag": 7},
@@ -51,15 +52,19 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       const TransactionsPage(),
       const WalletPage(),
       const SettingPage(),
+      const NotifPage(),
     ];
   }
 
+  final ScrollController _scrollController = ScrollController();
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: CustomScrollView(
+        controller: _scrollController,
         slivers: <Widget>[
           SliverAppBar(
             automaticallyImplyLeading: false,
@@ -71,7 +76,9 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
             flexibleSpace: Stack(
               alignment: Alignment.center,
               children: <Widget>[
-                Container(
+                AnimatedContainer(
+                  duration: const Duration(milliseconds: 200),
+                  height: collapse ? 320 : 190,
                   clipBehavior: Clip.antiAlias,
                   padding: const EdgeInsets.symmetric(
                     horizontal: 20,
@@ -133,21 +140,44 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                               ],
                             ),
                           ),
-                          Container(
-                            width: 40,
-                            height: 40,
-                            decoration: BoxDecoration(
-                              color: const Color.fromARGB(255, 12, 86, 69),
-                              borderRadius: BorderRadius.circular(10),
-                              border: const GradientBoxBorder(
-                                gradient: Constants.appGradient,
-                                width: 0.8,
+                          InkWell(
+                            onTap: () {
+                              setState(() {
+                                Constants.activeHomePage = 9;
+                              });
+                            },
+                            child: Container(
+                              width: 40,
+                              height: 40,
+                              decoration: BoxDecoration(
+                                color: const Color.fromARGB(255, 12, 86, 69),
+                                borderRadius: BorderRadius.circular(10),
+                                border: GradientBoxBorder(
+                                  gradient: Constants.activeHomePage != 9
+                                      ? Constants.appGradient
+                                      : const LinearGradient(
+                                          colors: [
+                                            Constants.secondColor,
+                                            Color.fromARGB(255, 242, 214, 117),
+                                          ],
+                                        ),
+                                  width: 0.8,
+                                ),
                               ),
-                            ),
-                            child: Padding(
-                              padding: const EdgeInsets.all(7.0),
-                              child: SvgPicture.asset(
-                                './assets/svgs/notif-icon.svg',
+                              child: Padding(
+                                padding: const EdgeInsets.all(7.0),
+                                child: SvgPicture.asset(
+                                  './assets/svgs/notif-icon.svg',
+                                  colorFilter: Constants.activeHomePage != 9
+                                      ? const ColorFilter.mode(
+                                          Colors.transparent,
+                                          BlendMode.colorBurn,
+                                        )
+                                      : const ColorFilter.mode(
+                                          Constants.secondColor,
+                                          BlendMode.srcIn,
+                                        ),
+                                ),
                               ),
                             ),
                           ),
@@ -158,7 +188,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                       Container(
                         width: size.width,
                         margin: const EdgeInsets.symmetric(
-                          vertical: 25,
+                          vertical: 20,
                         ),
                         padding: const EdgeInsets.all(15),
                         decoration: BoxDecoration(
@@ -188,7 +218,9 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                 ' 4,840,200 ',
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
-                                    fontSize: 22, fontWeight: FontWeight.w700),
+                                  fontSize: 25,
+                                  fontWeight: FontWeight.w700,
+                                ),
                               ),
                             ),
                             Text(
@@ -227,8 +259,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                     child: Column(
                                       children: <Widget>[
                                         Container(
-                                          width: 65,
-                                          height: 65,
+                                          width: 60,
+                                          height: 60,
                                           decoration: BoxDecoration(
                                             color: const Color.fromARGB(
                                                 255, 12, 86, 69),
@@ -304,13 +336,12 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                       onTap: () {
                         collapsedSliverAppBar();
                       },
-                      child: RotationTransition(
-                        turns: AlwaysStoppedAnimation(rotationTransition),
-                        child: const Icon(
-                          Icons.keyboard_arrow_down_sharp,
-                          color: Constants.themeColor,
-                          size: 40,
-                        ),
+                      child: Icon(
+                        collapse
+                            ? Icons.keyboard_arrow_up_sharp
+                            : Icons.keyboard_arrow_down_sharp,
+                        color: Constants.themeColor,
+                        size: 40,
                       ),
                     ),
                   ),
@@ -318,11 +349,32 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
               ],
             ),
           ),
+          // SliverToBoxAdapter(
+          //   child: IndexedStack(
+          //     index: Constants.activeHomePage,
+          //     children: _pages(),
+          //   ),
+          // ),
           SliverToBoxAdapter(
-            child: IndexedStack(
-              index: Constants.activeHomePage,
-              children: _pages(),
-            ),
+            child: Constants.activeHomePage == 0
+                ? AccountBalance(callback: callback)
+                : Constants.activeHomePage == 1
+                    ? const ContentPage()
+                    : Constants.activeHomePage == 2
+                        ? const ContentPage()
+                        : Constants.activeHomePage == 3
+                            ? const ContentPage()
+                            : Constants.activeHomePage == 4
+                                ? const BuyCard()
+                                : Constants.activeHomePage == 5
+                                    ? const ProfilePage()
+                                    : Constants.activeHomePage == 6
+                                        ? const TransactionsPage()
+                                        : Constants.activeHomePage == 7
+                                            ? const WalletPage()
+                                            : Constants.activeHomePage == 8
+                                                ? const SettingPage()
+                                                : const NotifPage(),
           ),
         ],
       ),
@@ -337,14 +389,19 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
             setState(() {
               _currentIndex = i;
               Constants.activeHomePage = i;
+              collapsedHeight = 165;
+
+              debugPrint(collapse.toString());
               if (i == 0) {
-                collapsedHeight = 165;
-                expandedHeight = 300;
-                rotationTransition = 180 / 360;
+                expandedHeight = 290;
+                collapse = true;
               } else {
-                collapsedHeight = 165;
-                expandedHeight = 165;
-                rotationTransition = 0 / 360;
+                collapse = false;
+                Future.delayed(const Duration(milliseconds: 200), () {
+                  setState(() {
+                    expandedHeight = 165;
+                  });
+                });
               }
             });
           },
@@ -383,16 +440,38 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   }
 
   collapsedSliverAppBar() {
-    setState(() {
-      if (collapsedHeight - expandedHeight != 0) {
-        collapsedHeight = 165;
-        expandedHeight = 165;
-        rotationTransition = 0 / 360;
-      } else {
-        collapsedHeight = 165;
-        expandedHeight = 300;
-        rotationTransition = 180 / 360;
-      }
-    });
+    collapsedHeight = 165;
+    debugPrint(collapse.toString());
+    if (collapse) {
+      setState(() {
+        collapse = false;
+        // Future.delayed(const Duration(milliseconds: 200), () {
+        //   if (collapsedHeight - expandedHeight != 0) {
+        //     expandedHeight = 165;
+        //   } else {
+        //     expandedHeight = 290;
+        //   }
+        // });
+        _scrollController.animateTo(130,
+            duration: const Duration(milliseconds: 200), curve: Curves.ease);
+      });
+      // });
+    } else {
+      setState(() {
+        collapse = true;
+        // Future.delayed(const Duration(milliseconds: 200), () {
+        //   if (collapsedHeight - expandedHeight != 0) {
+        //     expandedHeight = 165;
+        //   } else {
+        //     expandedHeight = 290;
+        //   }
+        // });
+        _scrollController.animateTo(0,
+            duration: const Duration(milliseconds: 200), curve: Curves.ease);
+      });
+      // Future.delayed(const Duration(milliseconds: 50), () {
+
+      // });
+    }
   }
 }

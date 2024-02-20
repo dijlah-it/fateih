@@ -43,14 +43,11 @@ class _SplashPageState extends State<SplashPage> {
             height: size.height,
           ),
           Center(
-            child: Hero(
-              tag: 'logo',
-              child: Image.asset(
-                './assets/images/logo.png',
-                fit: BoxFit.fill,
-                width: 250,
-                height: 250,
-              ),
+            child: Image.asset(
+              './assets/images/logo.png',
+              fit: BoxFit.fill,
+              width: 250,
+              height: 250,
             ),
           ),
         ],
