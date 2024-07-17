@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "636405658586",
+    "project_id": "fatyh-a841c",
+    "storage_bucket": "fatyh-a841c.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:636405658586:android:cbbc2f811bb70a229a86e3",
+        "android_client_info": {
+          "package_name": "com.dijlah.fatyh"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAwY1zfCTbie2h9pEe0zC6WsXUslB2eSpY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

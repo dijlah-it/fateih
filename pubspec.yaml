@@ -16,7 +16,7 @@ publish_to: "none" # Remove this line if you wish to publish to pub.dev
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
 # In Windows, build-name is used as the major, minor, and patch parts
 # of the product and file versions while build-number is used as the build suffix.
-version: 1.0.0+1
+version: 1.0.0+9
 
 environment:
   sdk: ">=3.2.3 <4.0.0"
@@ -38,7 +38,7 @@ dependencies:
   gradient_borders: ^1.0.0
   pinput: ^3.0.1
   intl_phone_field: ^3.2.0
-  shimmer_effect: ^1.0.4
+
   awesome_snackbar_content_new: ^0.1.2
   salomon_bottom_bar: ^3.3.2
   flutter_svg: ^2.0.9
@@ -48,16 +48,46 @@ dependencies:
   carousel_slider: ^4.2.1
   action_slider: ^0.7.0
   auto_size_text_field: ^2.2.2
-
+  shared_preferences: ^2.2.2
+  http: ^1.2.1
+  auto_size_text: ^3.0.0
+  email_validator: ^2.1.17
+  flutter_html: ^3.0.0-beta.2
+  firebase_messaging: ^14.7.20
+  firebase_core: ^2.27.1
+  get_storage: ^2.1.1
+  share_plus: ^7.2.1
+  flutter_sms:
+    git:
+      url: https://github.com/fluttercommunity/flutter_sms.git
+      ref: master
+  flutter_phone_direct_caller: ^2.1.1
+  icons_launcher: ^2.1.7
+  overlay_support: ^2.1.0
+  package_info_plus: ^7.0.0
+  url_launcher: ^6.2.5
+  universal_html: ^2.2.4
+  local_auth: ^2.2.0
+  image_picker: ^1.1.1
+  go_router: ^14.0.2
+  delayed_widget: ^1.1.2
+  flutter_inappwebview: ^6.0.0
 dev_dependencies:
   flutter_test:
     sdk: flutter
 
-  # The "flutter_lints" package below contains a set of recommended lints to
-  # encourage good coding practices. The lint set provided by the package is
-  # activated in the `analysis_options.yaml` file located at the root of your
-  # package. See that file for information about deactivating specific lint
-  # rules and activating additional ones.
+icons_launcher:
+  image_path: "assets/images/appIcon.png"
+  platforms:
+    android:
+      enable: true
+    ios:
+      enable: true
+    web:
+      enable: true
+      image_path: "assets/images/appIcon.png"
+      favicon_path: "assets/images/appIcon.png"
+
   flutter_lints: ^2.0.0
 
 # For information on the generic Dart part of this file, see the
@@ -74,7 +104,7 @@ flutter:
   assets:
     - assets/images/
     - assets/svgs/
-  #   - images/a_dot_ham.jpeg
+    - assets/svgs/userDataIcons/
 
   fonts:
     - family: dijlah
@@ -82,6 +112,9 @@ flutter:
         - asset: ./assets/fonts/dijlah-reg.ttf
         - asset: ./assets/fonts/dijfont-bold.ttf
           weight: 700
+    - family: Continental
+      fonts:
+        - asset: ./assets/fonts/Continental-ext-roman.ttf
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

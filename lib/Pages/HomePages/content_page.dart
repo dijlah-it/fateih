@@ -1,8 +1,16 @@
+import 'package:fateih/Constants/constants.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_html/flutter_html.dart';
 import 'package:gap/gap.dart';
 
 class ContentPage extends StatefulWidget {
-  const ContentPage({super.key});
+  final String title;
+  final String text;
+  const ContentPage({
+    super.key,
+    required this.title,
+    required this.text,
+  });
 
   @override
   State<ContentPage> createState() => _ContentPageState();
@@ -24,26 +32,42 @@ class _ContentPageState extends State<ContentPage> {
         crossAxisAlignment: CrossAxisAlignment.end,
         children: <Widget>[
           Text(
-            'عن التطبيق',
+            widget.title,
             style: TextStyle(
               fontWeight: FontWeight.w700,
+              color: Constants.darkModeEnabled ? Colors.white : Colors.black,
             ),
           ),
           const Gap(10),
           Container(
             width: size.width,
-            padding: EdgeInsets.all(10),
+            constraints: BoxConstraints(
+              maxHeight: size.height * 0.6,
+            ),
+            padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
               color: Colors.grey.withAlpha(50),
               borderRadius: BorderRadius.circular(10),
             ),
-            child: Text(
-              'لوريم إيبسوم هو ببساطة نص شكلي (بمعنى أن الغاية هي الشكل وليس المحتوى) ويُستخدم في صناعات المطابع ودور النشر. كان لوريم إيبسوم ولايزال المعيار للنص الشكلي منذ القرن الخامس عشر عندما قامت مطبعة مجهولة برص مجموعة من الأحرف بشكل عشوائي أخذتها من نص، لتكوّن كتيّب بمثابة دليل أو مرجع شكلي لهذه الأحرف. خمسة قرون من الزمن لم تقضي على هذا النص، بل انه حتى صار مستخدماً وبشكله الأصلي في الطباعة والتنضيد الإلكتروني. انتشر بشكل كبير في ستينيّات هذا القرن مع إصدار رقائق "ليتراسيت" البلاستيكية تحوي مقاطع من هذا النص، وعاد لينتشر مرة أخرى مؤخراَ مع ظهور برامج النشر الإلكتروني مثل "ألدوس بايج مايكر" والتي حوت أيضاً على نسخ من نص لوريم إيبسوم.',
-              textAlign: TextAlign.justify,
-              textDirection: TextDirection.rtl,
-              style: TextStyle(
-                height: 1.8,
-                fontSize: 16
+            child: SingleChildScrollView(
+              child: Html(
+                data: """
+                  <!DOCTYPE html>
+                    <html dir='rtl'>
+                      <body>
+                      <div style='direction: rtl;'>${widget.text}</div>
+                        </body>
+                      </html>
+                    """,
+                style: {
+                  "p": Style(
+                    lineHeight: const LineHeight(1.8),
+                    fontSize: FontSize(16),
+                    textAlign: TextAlign.justify,
+                    color:
+                        Constants.darkModeEnabled ? Colors.white : Colors.black,
+                  ),
+                },
               ),
             ),
           ),

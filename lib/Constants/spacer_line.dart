@@ -19,11 +19,12 @@ class SpacerLine extends StatelessWidget {
             size: 6,
           ),
         ),
-        Container(
-          height: 1,
-          width: 18,
-          decoration: const BoxDecoration(
-            gradient: Constants.appGradient,
+        Expanded(
+          child: Container(
+            height: 1,
+            decoration: const BoxDecoration(
+              gradient: Constants.appGradient,
+            ),
           ),
         ),
         const RotationTransition(

@@ -1,7 +1,12 @@
 import 'dart:async';
 
+import 'package:fateih/Api/api.dart';
+import 'package:fateih/Constants/constants.dart';
+import 'package:fateih/Pages/HomePages/home.dart';
 import 'package:fateih/Pages/StartPages/login_page.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:delayed_widget/delayed_widget.dart';
 
 class SplashPage extends StatefulWidget {
   const SplashPage({super.key});
@@ -17,10 +22,17 @@ class _SplashPageState extends State<SplashPage> {
   void initState() {
     super.initState();
     timer = Timer(const Duration(seconds: 3), () {
-      Navigator.popAndPushNamed(
-        context,
-        LogInPage.routName,
-      );
+      debugPrint(Constants.userTokenLocal.read('token'));
+
+      if (Constants.userTokenLocal.read('token') == null) {
+        GoRouter.of(context).pushReplacement(LogInPage.routName);
+      } else {
+        homeAPI(Constants.userTokenLocal.read('token')).then(
+          (value) {
+            GoRouter.of(context).pushReplacement(HomePage.routName);
+          },
+        );
+      }
     });
   }
 
@@ -43,11 +55,15 @@ class _SplashPageState extends State<SplashPage> {
             height: size.height,
           ),
           Center(
-            child: Image.asset(
-              './assets/images/logo.png',
-              fit: BoxFit.fill,
-              width: 250,
-              height: 250,
+            child: DelayedWidget(
+              animationDuration: Duration(seconds: 2),
+              // animation: DelayedAnimations.SLIDE_FROM_TOP,
+              child: Image.asset(
+                './assets/images/logo.png',
+                fit: BoxFit.fill,
+                width: 250,
+                height: 250,
+              ),
             ),
           ),
         ],

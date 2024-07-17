@@ -1,21 +1,27 @@
+import 'package:fateih/Api/api.dart';
 import 'package:fateih/Constants/constants.dart';
-import 'package:fateih/Pages/HomePages/home.dart';
+import 'package:fateih/Constants/start_bg.dart';
+import 'package:fateih/Constants/unicorn_outline_button.dart';
+import 'package:fateih/Pages/StartPages/signup_page.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
-import 'package:awesome_snackbar_content_new/awesome_snackbar_content.dart';
+import 'package:go_router/go_router.dart';
 import 'package:pinput/pinput.dart';
 
 class OtpPage extends StatefulWidget {
-  const OtpPage({super.key});
+  const OtpPage({
+    super.key,
+  });
 
   @override
   State<OtpPage> createState() => _OtpPageState();
-  static String routName = "OtpPage";
+  static String routName = "/OtpPage";
 }
 
 class _OtpPageState extends State<OtpPage> {
   @override
   Widget build(BuildContext context) {
+    // final Map arguments = ModalRoute.of(context)!.settings.arguments as Map;
     Size size = MediaQuery.of(context).size;
     return Scaffold(
       body: SizedBox(
@@ -23,12 +29,12 @@ class _OtpPageState extends State<OtpPage> {
         height: size.height,
         child: SingleChildScrollView(
           child: Stack(
+            alignment: Alignment.center,
             children: <Widget>[
               // BG
               StartBG(size: size),
-              Positioned(
-                right: 30,
-                top: 350,
+              const Positioned(
+                top: 330,
                 child: Text(
                   'رمز التحقق من رقم الهاتف',
                   style: TextStyle(
@@ -43,7 +49,9 @@ class _OtpPageState extends State<OtpPage> {
                 child: SizedBox(
                   width: size.width,
                   child: FractionallySizedBox(
-                    child: PinputExample(),
+                    child: PinputExample(
+                      phone: Constants.userPhoneNumber,
+                    ),
                   ),
                 ),
               ),
@@ -56,8 +64,11 @@ class _OtpPageState extends State<OtpPage> {
 }
 
 class PinputExample extends StatefulWidget {
-  const PinputExample({Key? key}) : super(key: key);
-
+  const PinputExample({
+    Key? key,
+    required this.phone,
+  }) : super(key: key);
+  final String phone;
   @override
   State<PinputExample> createState() => _PinputExampleState();
 }
@@ -66,6 +77,7 @@ class _PinputExampleState extends State<PinputExample> {
   final pinController = TextEditingController();
   final focusNode = FocusNode();
   final formKey = GlobalKey<FormState>();
+  Future? _otpFuture;
 
   @override
   void dispose() {
@@ -81,14 +93,14 @@ class _PinputExampleState extends State<PinputExample> {
     const borderColor = Color.fromRGBO(23, 171, 144, 0.4);
 
     final defaultPinTheme = PinTheme(
-      width: 56,
-      height: 56,
+      width: 47,
+      height: 47,
       textStyle: const TextStyle(
-        fontSize: 22,
+        fontSize: 18,
         color: Colors.white,
       ),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(19),
+        borderRadius: BorderRadius.circular(5),
         border: Border.all(color: borderColor),
       ),
     );
@@ -98,70 +110,112 @@ class _PinputExampleState extends State<PinputExample> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
-          Directionality(
-            textDirection: TextDirection.rtl,
-            child: Pinput(
-              controller: pinController,
-              focusNode: focusNode,
-              androidSmsAutofillMethod:
-                  AndroidSmsAutofillMethod.smsUserConsentApi,
-              listenForMultipleSmsOnAndroid: true,
-              defaultPinTheme: defaultPinTheme,
-              separatorBuilder: (index) => const SizedBox(width: 8),
-              validator: (value) {
-                return value == '2222' ? null : 'رمز التحقق غير صحيح';
-              },
-              // onClipboardFound: (value) {
-              //   debugPrint('onClipboardFound: $value');
-              //   pinController.setText(value);
-              // },
-              hapticFeedbackType: HapticFeedbackType.lightImpact,
-              onCompleted: (pin) {
-                debugPrint('onCompleted: $pin');
-              },
-              onChanged: (value) {
-                debugPrint('onChanged: $value');
-              },
-              cursor: Column(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: <Widget>[
-                  Container(
-                    margin: const EdgeInsets.only(bottom: 9),
-                    width: 22,
-                    height: 1,
-                    color: focusedBorderColor,
-                  ),
-                ],
-              ),
-              focusedPinTheme: defaultPinTheme.copyWith(
-                decoration: defaultPinTheme.decoration!.copyWith(
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: focusedBorderColor),
+          Text(
+            Constants.userData?['otp']['otp'].toString() ?? 'ادخل الرمز',
+            style: TextStyle(color: Colors.white.withAlpha(100)),
+          ),
+          const Gap(10),
+          Pinput(
+            controller: pinController,
+            focusNode: focusNode,
+            length: 6,
+            androidSmsAutofillMethod:
+                AndroidSmsAutofillMethod.smsUserConsentApi,
+            listenForMultipleSmsOnAndroid: true,
+            defaultPinTheme: defaultPinTheme,
+            separatorBuilder: (index) => const SizedBox(width: 8),
+            validator: (value) {
+              return value?.length == 6
+                  ? checkOTP(
+                      Constants.userData!['otp']['user_id'].toString(),
+                      pinController.text,
+                    )
+                  : '';
+            },
+            hapticFeedbackType: HapticFeedbackType.lightImpact,
+            onCompleted: (pin) {
+              debugPrint('onCompleted: $pin');
+            },
+            onChanged: (value) {
+              debugPrint('onChanged: $value');
+            },
+            cursor: Column(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: <Widget>[
+                Container(
+                  margin: const EdgeInsets.only(bottom: 9),
+                  width: 22,
+                  height: 1,
+                  color: focusedBorderColor,
                 ),
+              ],
+            ),
+            focusedPinTheme: defaultPinTheme.copyWith(
+              decoration: defaultPinTheme.decoration!.copyWith(
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: focusedBorderColor),
               ),
-              submittedPinTheme: defaultPinTheme.copyWith(
-                decoration: defaultPinTheme.decoration!.copyWith(
-                  color: fillColor,
-                  borderRadius: BorderRadius.circular(19),
-                  border: Border.all(color: focusedBorderColor),
-                ),
+            ),
+            submittedPinTheme: defaultPinTheme.copyWith(
+              decoration: defaultPinTheme.decoration!.copyWith(
+                color: fillColor,
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: focusedBorderColor),
               ),
-              errorPinTheme: defaultPinTheme.copyBorderWith(
-                border: Border.all(color: Colors.redAccent),
-              ),
+            ),
+            errorPinTheme: defaultPinTheme.copyBorderWith(
+              border: Border.all(color: Colors.redAccent),
             ),
           ),
           const Gap(30),
           Text(
-            ' ارسال لك رمز تاكيد على رقم الهاتف :\n 964777777777+',
-            style: TextStyle(
+            ' ارسال لك رمز تاكيد على رقم الهاتف : \n ${widget.phone}',
+            style: const TextStyle(
               color: Colors.white70,
               height: 2,
             ),
             textDirection: TextDirection.rtl,
             textAlign: TextAlign.center,
           ),
-          const Gap(30),
+          const Gap(20),
+          FutureBuilder(
+            future: _otpFuture,
+            builder: (BuildContext context, AsyncSnapshot snapshot) {
+              debugPrint(snapshot.data?['errors'][0]);
+              switch (snapshot.connectionState) {
+                case ConnectionState.waiting:
+                  return const Center(
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: Colors.white,
+                    ),
+                  );
+                case ConnectionState.done:
+                  return snapshot.data?['errors'][0] != null
+                      ? Row(
+                          children: <Widget>[
+                            Text(
+                              snapshot.data['errors'][0],
+                              style: const TextStyle(
+                                color: Colors.red,
+                                fontSize: 15,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                            const Gap(5),
+                            const Icon(
+                              Icons.error_outline,
+                              color: Colors.red,
+                            )
+                          ],
+                        )
+                      : SizedBox();
+                default:
+                  return const Text('');
+              }
+            },
+          ),
+          const Gap(20),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
@@ -169,15 +223,14 @@ class _PinputExampleState extends State<PinputExample> {
                 strokeWidth: 1,
                 radius: 24,
                 gradient: Constants.appGradient,
-                child: Text(
+                child: const Text(
                   'تعديل الرقم',
                   style: TextStyle(
                     color: Colors.white,
                   ),
                 ),
                 onPressed: () {
-                  focusNode.unfocus();
-                  formKey.currentState!.validate();
+                  context.go(SignUpPage.routName);
                 },
               ),
               const Gap(10),
@@ -190,34 +243,15 @@ class _PinputExampleState extends State<PinputExample> {
                 child: ElevatedButton(
                   clipBehavior: Clip.antiAlias,
                   onPressed: () {
-                    debugPrint('Working !!!');
-                    Navigator.popAndPushNamed(
-                      context,
-                      HomePage.routName,
-                    );
-
-                    final snackBar = SnackBar(
-                      elevation: 0,
-                      // behavior: SnackBarBehavior.floating,
-                      backgroundColor: Colors.transparent,
-                      content: Directionality(
-                        textDirection: TextDirection.rtl,
-                        child: AwesomeSnackbarContent(
-                          title: 'اهلا بك',
-                          message: 'اهلا بك يا محمد',
-                          contentType: ContentType.success,
-                        ),
-                      ),
-                    );
-
-                    ScaffoldMessenger.of(context)
-                      ..hideCurrentSnackBar()
-                      ..showSnackBar(snackBar);
+                    // if (formKey.currentState!.validate()) {
+                    //   checkOTP(Constants.userData!['otp']['user_id'].toString(),
+                    //       Constants.userData!['otp']['otp'].toString());
+                    // }
                   },
                   style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.transparent,
                       shadowColor: Colors.transparent),
-                  child: Text(
+                  child: const Text(
                     'تاكيد',
                     style: TextStyle(
                       color: Colors.white,
@@ -229,6 +263,21 @@ class _PinputExampleState extends State<PinputExample> {
           )
         ],
       ),
+    );
+  }
+
+  checkOTP(String userId, String otp) {
+    debugPrint('=============================');
+    debugPrint(userId);
+    debugPrint(otp);
+    debugPrint('=============================');
+
+    FocusManager.instance.primaryFocus?.unfocus();
+    _otpFuture = getUserToken(
+      context,
+      'checkotp',
+      userId,
+      otp,
     );
   }
 }

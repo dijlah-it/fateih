@@ -1,8 +1,8 @@
 import 'package:fateih/Constants/constants.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:gap/gap.dart';
 import 'package:gradient_borders/gradient_borders.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class NotifPage extends StatefulWidget {
   const NotifPage({super.key});
@@ -12,6 +12,25 @@ class NotifPage extends StatefulWidget {
 }
 
 class _NotifPageState extends State<NotifPage> {
+  List<String> titleContent = [];
+  List<String> bodyContent = [];
+  List<String> dateContent = [];
+  _getContents() async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    setState(() {
+      titleContent = pref.getStringList("titleContent") ?? [];
+      bodyContent = pref.getStringList("bodyContent") ?? [];
+      dateContent = pref.getStringList("dateContent") ?? [];
+    });
+  }
+
+  @override
+  void initState() {
+    _getContents();
+    super.initState();
+    debugPrint('--------->' + bodyContent.toString());
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -19,13 +38,27 @@ class _NotifPageState extends State<NotifPage> {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(10),
       ),
-      child: Column(
-        children: [
-          ...List.generate(8, (index) {
-            return const NotifCard();
-          }),
-        ],
-      ),
+      child: bodyContent.isNotEmpty
+          ? Column(
+              children: [
+                ...List.generate(bodyContent.length, (index) {
+                  return NotifCard(
+                    body: bodyContent[index],
+                    date: dateContent[index],
+                  );
+                }),
+              ],
+            )
+          : Center(
+              child: Text(
+                'لا توجد نتائج',
+                style: TextStyle(
+                  color: Constants.darkModeEnabled
+                      ? Constants.backgroundColorDark
+                      : Colors.white,
+                ),
+              ),
+            ),
     );
   }
 }
@@ -33,7 +66,11 @@ class _NotifPageState extends State<NotifPage> {
 class NotifCard extends StatelessWidget {
   const NotifCard({
     super.key,
+    required this.body,
+    required this.date,
   });
+  final String body;
+  final String date;
 
   @override
   Widget build(BuildContext context) {
@@ -51,7 +88,7 @@ class NotifCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(10),
         border: const GradientBoxBorder(
           gradient: Constants.appGradient,
-          width: 2,
+          width: 1,
         ),
       ),
       child: Row(
@@ -59,35 +96,36 @@ class NotifCard extends StatelessWidget {
         children: <Widget>[
           Icon(
             Icons.notifications_none,
-            color: Constants.itemColor,
+            color: Constants.secondColor,
             size: 30,
           ),
           Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: <Widget>[
               Text(
-                '2024-06-05 13:33:39',
-                style: TextStyle(
+                date,
+                style: const TextStyle(
                   color: Colors.white70,
-                  fontSize: 14,
+                  fontSize: 12,
                 ),
               ),
               const Gap(15),
               Row(
                 children: <Widget>[
                   Text(
-                    ' 5000 IQD شحن اونلاين',
-                    style: TextStyle(
-                      color: Colors.white,
+                    body,
+                    style: const TextStyle(
+                      color: Constants.itemColor,
                       fontWeight: FontWeight.w700,
                       fontSize: 15,
                     ),
                   ),
                   const Gap(5),
-                  SvgPicture.asset(
-                    './assets/svgs/card-tick.svg',
-                    colorFilter: ColorFilter.mode(Constants.secondColor, BlendMode.srcIn),
-                  ),
+                  // SvgPicture.asset(
+                  //   './assets/svgs/card-tick.svg',
+                  //   colorFilter:
+                  //       const ColorFilter.mode(Colors.white, BlendMode.srcIn),
+                  // ),
                 ],
               ),
             ],

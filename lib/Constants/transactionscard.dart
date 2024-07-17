@@ -1,6 +1,8 @@
 import 'package:fateih/Constants/constants.dart';
 import 'package:fateih/Constants/spacer_line.dart';
+import 'package:fateih/Constants/switch_call.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:gap/gap.dart';
 import 'package:gradient_borders/gradient_borders.dart';
 import 'package:substring_highlight/substring_highlight.dart';
@@ -8,15 +10,28 @@ import 'package:substring_highlight/substring_highlight.dart';
 class TransactionsCard extends StatelessWidget {
   const TransactionsCard({
     super.key,
+    required this.serial,
+    required this.date,
+    required this.payment,
+    this.sellText,
+    this.icon,
+    this.term,
   });
+  final String serial;
+  final String date;
+  final String payment;
+  final String? icon;
+  final String? term;
+  final String? sellText;
 
   @override
   Widget build(BuildContext context) {
+    debugPrint("icon================>>${icon}");
     return Container(
       padding: const EdgeInsets.all(10.0),
-      margin: const EdgeInsets.symmetric(
-        horizontal: 10,
-        vertical: 5,
+      margin: const EdgeInsets.symmetric(vertical: 5),
+      constraints: BoxConstraints(
+        maxWidth: 600,
       ),
       decoration: BoxDecoration(
         image: const DecorationImage(
@@ -26,25 +41,31 @@ class TransactionsCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(10),
         border: const GradientBoxBorder(
           gradient: Constants.appGradient,
-          width: 2,
+          width: 1,
         ),
       ),
       child: Column(
         children: <Widget>[
-          const Row(
+          Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
               Text(
-                '2024-06-05 13:33:39',
-                style: TextStyle(
+                date,
+                style: const TextStyle(
                   color: Colors.white,
                   fontSize: 13,
                 ),
               ),
-              SpacerLine(),
+              const Expanded(
+                flex: 1,
+                child: Padding(
+                  padding: EdgeInsets.only(left: 10),
+                  child: SpacerLine(),
+                ),
+              ),
               Text(
-                '19090108776460',
-                style: TextStyle(
+                serial,
+                style: const TextStyle(
                   color: Colors.white,
                   fontSize: 13,
                 ),
@@ -56,24 +77,48 @@ class TransactionsCard extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
               SubstringHighlight(
-                text: 'ZAIN_2000IQD Zain (SHARE)',
-                term: 'SHARE',
+                text: payment,
+                term: term,
                 textStyle: const TextStyle(
                   color: Colors.white,
+                  fontSize: 17,
                 ),
                 textStyleHighlight: const TextStyle(
-                  color: Constants.itemColor,
-                ),
+                    color: Constants.itemColor, fontWeight: FontWeight.w700),
               ),
-              InkWell(
-                onTap: () {
-                  debugPrint('statement');
-                },
-                child: const Icon(
-                  Icons.share_outlined,
-                  color: Constants.itemColor,
-                ),
-              )
+              icon != 'card' && icon != 'online_pay'
+                  ? InkWell(
+                      onTap: () async {
+                        switchCall(sellText!, icon!, context);
+                      },
+                      child: Icon(
+                        icon == 'نسخ'
+                            ? Icons.copy
+                            : icon == 'SMS'
+                                ? Icons.sms
+                                : icon == 'share'
+                                    ? Icons.share
+                                    : icon == 'تعبئة'
+                                        ? Icons.chrome_reader_mode_outlined
+                                        : icon == 'شراء'
+                                            ? Icons.file_download_outlined
+                                            : null,
+                        color: Constants.secondColor,
+                      ),
+                    )
+                  : icon == 'card'
+                      ? SvgPicture.asset(
+                          './assets/svgs/Group6413.svg',
+                          colorFilter: const ColorFilter.mode(
+                              Colors.white, BlendMode.srcIn),
+                        )
+                      : icon == 'online_pay'
+                          ? SvgPicture.asset(
+                              './assets/svgs/card-tick.svg',
+                              colorFilter: const ColorFilter.mode(
+                                  Colors.white, BlendMode.srcIn),
+                            )
+                          : SizedBox(),
             ],
           ),
         ],
