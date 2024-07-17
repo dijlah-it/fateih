@@ -10,7 +10,7 @@ import 'package:overlay_support/overlay_support.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'dart:io';
-
+ 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await GetStorage.init();
